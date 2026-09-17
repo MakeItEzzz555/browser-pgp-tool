@@ -1,0 +1,38 @@
+# Dependencies and generated output
+node_modules/
+vendor/
+.next/
+dist/
+build/
+bin/
+obj/
+target/
+out/
+coverage/
+.venv/
+venv/
+__pycache__/
+.pytest_cache/
+*.class
+# IDE and machine state
+.vs/
+.idea/
+*.user
+*.suo
+Debug/
+Release/
+x64/
+.DS_Store
+# Private runtime data
+.env
+.env.*
+!.env.example
+students.in
+members.txt
+*.log
+# Backups/build binaries
+*.zip
+*.rar
+*.exe
+*.dll
+*.pdb

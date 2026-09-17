@@ -1,0 +1,225 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Multi-Use PGP Tool</title>
+    <link rel="stylesheet" href="styles.css">
+    <script defer src="https://cdn.jsdelivr.net/npm/openpgp@6.3.1/dist/openpgp.min.js"></script>
+    <script defer src="app.js"></script>
+  </head>
+  <body>
+    <header class="app-header">
+      <div>
+        <p class="eyebrow">OpenPGP message utility</p>
+        <h1>Multi-Use PGP Tool</h1>
+      </div>
+      <div class="status-pill" id="libraryStatus">Loading OpenPGP.js</div>
+    </header>
+
+    <main class="app-shell">
+      <nav class="tabs" aria-label="PGP tool sections">
+        <button class="tab active" type="button" data-tab="generate">Generate Keys</button>
+        <button class="tab" type="button" data-tab="encrypt">Encrypt</button>
+        <button class="tab" type="button" data-tab="decrypt">Decrypt</button>
+        <button class="tab" type="button" data-tab="inspect">Inspect Keys</button>
+      </nav>
+
+      <section class="notice">
+        <strong>Local-only workflow.</strong>
+        Key handling and message operations run in this browser tab. Use trusted machines only, and keep private keys and passphrases secret.
+      </section>
+
+      <section class="panel active" id="generate" aria-labelledby="generate-title">
+        <div class="panel-heading">
+          <div>
+            <h2 id="generate-title">Generate A Key Pair</h2>
+            <p>Create armored OpenPGP public/private keys that can be copied into other compatible tools.</p>
+          </div>
+          <button class="primary" id="generateKeys" type="button">Generate</button>
+        </div>
+
+        <div class="grid two">
+          <label>
+            Name
+            <input id="genName" autocomplete="name" placeholder="Nicolas">
+          </label>
+          <label>
+            Email
+            <input id="genEmail" autocomplete="email" placeholder="nicolas@example.com">
+          </label>
+          <label>
+            Private Key Passphrase
+            <input id="genPassphrase" type="password" autocomplete="new-password" placeholder="Required">
+          </label>
+          <label>
+            Confirm Passphrase
+            <input id="genPassphraseConfirm" type="password" autocomplete="new-password" placeholder="Repeat passphrase">
+          </label>
+          <label>
+            Algorithm
+            <select id="genAlgorithm">
+              <option value="ecc">ECC Curve25519</option>
+              <option value="rsa">RSA 4096</option>
+            </select>
+          </label>
+          <label>
+            Key Expiration
+            <select id="genExpiration">
+              <option value="0">Does not expire</option>
+              <option value="31536000">1 year</option>
+              <option value="94608000">3 years</option>
+              <option value="157680000">5 years</option>
+            </select>
+          </label>
+        </div>
+
+        <div class="output-grid">
+          <div class="output-block">
+            <div class="output-toolbar">
+              <h3>Public Key</h3>
+              <div>
+                <button data-copy="publicKeyOutput" type="button">Copy</button>
+                <button data-download="publicKeyOutput" data-filename="public-key.asc" type="button">Download</button>
+              </div>
+            </div>
+            <textarea id="publicKeyOutput" readonly placeholder="Generated public key appears here"></textarea>
+          </div>
+          <div class="output-block">
+            <div class="output-toolbar">
+              <h3>Private Key</h3>
+              <div>
+                <button data-copy="privateKeyOutput" type="button">Copy</button>
+                <button data-download="privateKeyOutput" data-filename="private-key.asc" type="button">Download</button>
+              </div>
+            </div>
+            <textarea id="privateKeyOutput" readonly placeholder="Generated private key appears here"></textarea>
+          </div>
+        </div>
+        <p class="result" id="generateResult" role="status"></p>
+      </section>
+
+      <section class="panel" id="encrypt" aria-labelledby="encrypt-title">
+        <div class="panel-heading">
+          <div>
+            <h2 id="encrypt-title">Encrypt A Message</h2>
+            <p>Paste a recipient public key from this app, a website, GPG, Kleopatra, Thunderbird, Proton, or another OpenPGP-compatible tool.</p>
+          </div>
+          <button class="primary" id="encryptMessage" type="button">Encrypt</button>
+        </div>
+
+        <label>
+          Recipient Public Key
+          <textarea id="encryptPublicKey" placeholder="-----BEGIN PGP PUBLIC KEY BLOCK-----"></textarea>
+        </label>
+        <div class="toolbar-row">
+          <input id="publicKeyFile" type="file" accept=".asc,.pgp,.gpg,.txt">
+          <button data-clear="encryptPublicKey" type="button">Clear Key</button>
+        </div>
+
+        <label>
+          Plaintext Message
+          <textarea id="plainMessage" placeholder="Write the message to encrypt"></textarea>
+        </label>
+
+        <details>
+          <summary>Optional signing key</summary>
+          <div class="grid two">
+            <label>
+              Sender Private Key
+              <textarea id="signPrivateKey" placeholder="-----BEGIN PGP PRIVATE KEY BLOCK-----"></textarea>
+            </label>
+            <label>
+              Sender Private Key Passphrase
+              <input id="signPassphrase" type="password" autocomplete="current-password">
+            </label>
+          </div>
+        </details>
+
+        <div class="output-block">
+          <div class="output-toolbar">
+            <h3>Encrypted Message</h3>
+            <div>
+              <button data-copy="encryptedOutput" type="button">Copy</button>
+              <button data-download="encryptedOutput" data-filename="encrypted-message.asc" type="button">Download</button>
+            </div>
+          </div>
+          <textarea id="encryptedOutput" readonly placeholder="Encrypted message appears here"></textarea>
+        </div>
+        <p class="result" id="encryptResult" role="status"></p>
+      </section>
+
+      <section class="panel" id="decrypt" aria-labelledby="decrypt-title">
+        <div class="panel-heading">
+          <div>
+            <h2 id="decrypt-title">Decrypt A Message</h2>
+            <p>Unlock your private key with its passphrase to decrypt a PGP message.</p>
+          </div>
+          <button class="primary" id="decryptMessage" type="button">Decrypt</button>
+        </div>
+
+        <label>
+          Encrypted Message
+          <textarea id="encryptedInput" placeholder="-----BEGIN PGP MESSAGE-----"></textarea>
+        </label>
+        <div class="toolbar-row">
+          <input id="messageFile" type="file" accept=".asc,.pgp,.gpg,.txt">
+          <button data-clear="encryptedInput" type="button">Clear Message</button>
+        </div>
+
+        <div class="grid two">
+          <label>
+            Recipient Private Key
+            <textarea id="decryptPrivateKey" placeholder="-----BEGIN PGP PRIVATE KEY BLOCK-----"></textarea>
+          </label>
+          <label>
+            Private Key Passphrase
+            <input id="decryptPassphrase" type="password" autocomplete="current-password">
+          </label>
+        </div>
+
+        <details>
+          <summary>Optional verification public key</summary>
+          <label>
+            Sender Public Key
+            <textarea id="verifyPublicKey" placeholder="-----BEGIN PGP PUBLIC KEY BLOCK-----"></textarea>
+          </label>
+        </details>
+
+        <div class="output-block">
+          <div class="output-toolbar">
+            <h3>Decrypted Message</h3>
+            <div>
+              <button data-copy="decryptedOutput" type="button">Copy</button>
+              <button data-download="decryptedOutput" data-filename="decrypted-message.txt" type="button">Download</button>
+            </div>
+          </div>
+          <textarea id="decryptedOutput" readonly placeholder="Decrypted plaintext appears here"></textarea>
+        </div>
+        <p class="result" id="decryptResult" role="status"></p>
+      </section>
+
+      <section class="panel" id="inspect" aria-labelledby="inspect-title">
+        <div class="panel-heading">
+          <div>
+            <h2 id="inspect-title">Inspect A Key</h2>
+            <p>Validate an armored public or private key and read basic metadata.</p>
+          </div>
+          <button class="primary" id="inspectKey" type="button">Inspect</button>
+        </div>
+
+        <label>
+          Public Or Private Key
+          <textarea id="inspectKeyInput" placeholder="Paste any ASCII-armored OpenPGP key"></textarea>
+        </label>
+        <div class="toolbar-row">
+          <input id="inspectKeyFile" type="file" accept=".asc,.pgp,.gpg,.txt">
+          <button data-clear="inspectKeyInput" type="button">Clear Key</button>
+        </div>
+
+        <dl class="metadata" id="keyMetadata"></dl>
+        <p class="result" id="inspectResult" role="status"></p>
+      </section>
+    </main>
+  </body>
+</html>
