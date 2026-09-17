@@ -8,7 +8,7 @@ Browser-only OpenPGP key generation, encryption with optional signing, decryptio
 
 ## Features
 
-OpenPGP integration, async UI actions, armored-key/message parsing, downloads, validation/error feedback.
+Generate and inspect keys, encrypt with optional signing, or decrypt and verify armored messages. Results can be downloaded, and the interface reports input/operation errors.
 
 ## Tech Stack
 
