@@ -14,6 +14,14 @@ Generate and inspect keys, encrypt with optional signing, or decrypt and verify 
 
 HTML / CSS / JavaScript / OpenPGP.js
 
+## Preview
+
+A real local encrypt/decrypt round trip with a throwaway key pair and fictional message. The private-key and passphrase inputs were cleared after successful decryption and before capture; no private key is shown.
+
+![Encryption flow](docs/screenshots/encryption-flow.png)
+
+![Decryption flow](docs/screenshots/decryption-flow.png)
+
 ## Getting Started
 
 Open `index.html` in a modern browser with internet access for its OpenPGP.js 6.3.1 CDN script. The tabs provide key generation, encryption/signing, decryption/verification and key inspection. Use test keys/messages for initial exploration. User-entered key material is not included in this repository. Cryptographic round trips and interoperability were not revalidated during archival.
