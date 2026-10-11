@@ -28,7 +28,7 @@ Open `index.html` in a modern browser with internet access for its OpenPGP.js 6.
 
 ## Validation
 
-Lightweight local checks: JavaScript syntax. Compilation and syntax checks do not verify application behavior. Source is preserved; interactive application behavior was not executed during archival.
+Lightweight local checks: JavaScript syntax. Decryption with a verification key fails closed: plaintext is shown only after every signature verifies, and the output is cleared before each attempt (browser round trip checked 2026-10-11 with correct, wrong and missing signers). Compilation and syntax checks do not verify application behavior. Source is preserved; interactive application behavior was not executed during archival.
 
 ## Notes
 

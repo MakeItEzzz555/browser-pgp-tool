@@ -140,6 +140,7 @@
   async function decryptMessage() {
     setBusy(els.decryptMessage, true, "Decrypting...");
     setResult("decryptResult", "", "");
+    $("decryptedOutput").value = "";
     try {
       const armoredMessage = requireValue("encryptedInput", "Encrypted message");
       const privateKeyArmored = requireValue("decryptPrivateKey", "Recipient private key");
@@ -160,14 +161,18 @@
       }
 
       const result = await openpgp.decrypt(options);
-      $("decryptedOutput").value = result.data;
 
+      // Fail closed: plaintext is only shown once every signature has verified.
       if (verificationKeyArmored) {
+        if (!result.signatures.length) throw new Error("Message is not signed.");
         await Promise.all(result.signatures.map((signature) => signature.verified));
-        setResult("decryptResult", "Message decrypted and signature verified.", "success");
-      } else {
-        setResult("decryptResult", "Message decrypted.", "success");
       }
+      $("decryptedOutput").value = result.data;
+      setResult(
+        "decryptResult",
+        verificationKeyArmored ? "Message decrypted and signature verified." : "Message decrypted.",
+        "success",
+      );
     } catch (error) {
       setResult("decryptResult", error.message, "error");
     } finally {
